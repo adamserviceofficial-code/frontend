@@ -395,7 +395,7 @@ export default function Nav() {
           )}
 
           {/* navigation Small Screen (Sandwich) */}
-          <div className="relative block md:hidden shrink-0 ml-1">
+          <div className="relative hidden md:hidden shrink-0 ml-1">
             <div
               onClick={() => { setMobileMenuOpen(true); setMobileSearchOpen(false); }}
               className="flex flex-col gap-1.5 p-2 cursor-pointer"
