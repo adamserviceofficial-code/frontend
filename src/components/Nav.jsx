@@ -20,6 +20,7 @@ import { PiHeartFill } from "react-icons/pi";
 import posterPlaceholder from "../assets/images/poster-placeholder.png";
 import ThemeToggle from "./ThemeToggle";
 import GlobalAd from "./GlobalAd";
+import BottomNav from "./BottomNav";
 // import UserInfoBtn from "./Logout";
 const slugify = (text) => {
   if (!text) return "";
