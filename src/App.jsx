@@ -88,7 +88,7 @@ function App() {
       <AdComponent type="adSocialBar" />
       <AdComponent type="adSmartlink" />
       <Nav />
-      <div className="px-3 md:px-10 pt-20 md:pt-20 pb-10">
+      <div className="px-3 md:px-10 pt-20 md:pt-20 pb-24 md:pb-10">
         <AdComponent type="adBanner" />
         <Suspense fallback={<PageLoader />}>
           <Routes>

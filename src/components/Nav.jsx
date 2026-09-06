@@ -466,7 +466,12 @@ export default function Nav() {
         </div>
       </div>
 
+      <BottomNav
+        onSearchClick={() => {
+          setMobileMenuOpen(false);
+          setMobileSearchOpen(true);
+        }}
+      />
     </>
-  )
-  BottomNav
+  );
 }
