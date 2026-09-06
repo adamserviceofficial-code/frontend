@@ -467,5 +467,6 @@ export default function Nav() {
       </div>
 
     </>
-  );
+  )
+  BottomNav
 }
