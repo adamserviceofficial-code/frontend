@@ -1,11 +1,8 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// Author  : ThiruXD
-// GitHub  : https://github.com/ThiruXD
-// Portfolio: https://thiruxd.is-a.dev
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 import { lazy, Suspense, useEffect } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import ReactGa from "react-ga";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 if ('scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
@@ -66,6 +63,33 @@ const MaintenanceScreen = ({ message }) => (
   </div>
 );
 
+// Wrapped so useLocation (needs Router context) can drive the ErrorBoundary's
+// reset key -- navigating to a new page clears a previous crash automatically.
+function RoutedPages() {
+  const location = useLocation();
+  return (
+    <ErrorBoundary resetKey={location.pathname}>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="mov/:movieID/:slug?" element={<MovieDetails />} />
+          <Route path="ser/:seriesID/:slug?" element={<TvDetails />} />
+          <Route path="/movies" element={<Movies />} />
+          <Route path="/series" element={<Series />} />
+          <Route path="/collections" element={<Collections />} />
+          <Route path="/collection/:id" element={<Collection />} />
+          <Route path="*" element={<NotFoundPage />} />
+          <Route path="/similarMov/:movieID" element={<SimilarMov />} />
+          <Route path="/similarSeries/:seriesID" element={<SimilarSeries />} />
+          <Route path="/search/:searchResult" element={<SearResults />} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 function App() {
   const { settings } = useSettings();
   const isAdmin = sessionStorage.getItem("adminAuth") === "true";
@@ -90,23 +114,7 @@ function App() {
       <Nav />
       <div className="px-3 md:px-10 pt-20 md:pt-20 pb-24 md:pb-10">
         <AdComponent type="adBanner" />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/watchlist" element={<Watchlist />} />
-            <Route path="mov/:movieID/:slug?" element={<MovieDetails />} />
-            <Route path="ser/:seriesID/:slug?" element={<TvDetails />} />
-            <Route path="/movies" element={<Movies />} />
-            <Route path="/series" element={<Series />} />
-            <Route path="/collections" element={<Collections />} />
-            <Route path="/collection/:id" element={<Collection />} />
-            <Route path="*" element={<NotFoundPage />} />
-            <Route path="/similarMov/:movieID" element={<SimilarMov />} />
-            <Route path="/similarSeries/:seriesID" element={<SimilarSeries />} />
-            <Route path="/search/:searchResult" element={<SearResults />} />
-          </Routes>
-        </Suspense>
+        <RoutedPages />
       </div>
       <AdComponent type="adFooter" />
       <Footer />
