@@ -10,7 +10,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/black-and-white.css";
 import { useSettings } from "../context/SettingsContext";
 
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiMenu } from "react-icons/fi";
 import { BiLibrary, BiStar } from "react-icons/bi";
 import { PiHeartFill } from "react-icons/pi";
 import { TbHome2, TbDeviceTv, TbMovie } from "react-icons/tb";
@@ -39,10 +39,23 @@ export default function Nav() {
   const [isLoading, setIsLoading] = useState(true);
   const [navStatus, setNavStatus] = useState("Home");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showThemeToggle, setShowThemeToggle] = useState(() => {
     return localStorage.getItem("showThemeToggle") !== "false";
   });
   const location = useLocation();
+  const menuRef = useRef();
+
+  // Close the hamburger dropdown when clicking outside of it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Listen for admin toggle visibility changes (both same-tab and cross-tab/mobile wrapper)
   useEffect(() => {
@@ -362,17 +375,52 @@ export default function Nav() {
             )}
           </form>
 
-          {/* Theme Toggle - All Screens (replaces the old hamburger menu on mobile) */}
+          {/* Theme Toggle - Desktop only (Collections already in the top nav there) */}
           {showThemeToggle && (
-            <div className="shrink-0">
+            <div className="hidden md:block shrink-0">
               <ThemeToggle />
             </div>
           )}
 
+          {/* Hamburger Menu - Mobile only. Contains Collections + Theme Toggle */}
+          <div className="md:hidden relative shrink-0" ref={menuRef}>
+            <button
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="p-2 rounded-full border border-secondaryTextColor/20 text-primaryTextColor hover:bg-btnColor/70 transition-colors"
+              aria-label="Open menu"
+            >
+              <FiMenu size={22} />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute top-full right-0 mt-3 w-52 bg-btnColor border border-secondaryTextColor/10 rounded-xl shadow-2xl overflow-hidden z-30">
+                <Link
+                  to="/collections"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-primaryTextColor hover:bg-bgColor/60 transition-colors"
+                  style={{ textDecoration: "none" }}
+                >
+                  <BiLibrary size={18} />
+                  Collections
+                </Link>
+
+                {showThemeToggle && (
+                  <>
+                    <div className="h-px bg-secondaryTextColor/10" />
+                    <div className="flex items-center justify-between px-4 py-3 text-sm text-primaryTextColor">
+                      <span>Theme</span>
+                      <ThemeToggle />
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
 
-      {/* ─── Mobile Bottom Tab Bar (Home / Movies / Series / Collections / Watchlist) ─── */}
+      {/* ─── Mobile Bottom Tab Bar (Home / Movies / Series / Watchlist) - Collections moved to top hamburger menu ─── */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-bgColor/95 backdrop-blur-md border-t border-secondaryTextColor/15 flex items-center justify-around h-16">
         <Link
           to="/"
@@ -402,15 +450,6 @@ export default function Nav() {
           <span className="text-[10px] font-semibold">Series</span>
         </Link>
         <Link
-          to="/collections"
-          className={`flex flex-col items-center gap-1 w-14 transition-colors ${
-            location.pathname === "/collections" ? "text-otherColor" : "text-secondaryTextColor"
-          }`}
-        >
-          <BiLibrary className="text-xl" />
-          <span className="text-[10px] font-semibold">Collections</span>
-        </Link>
-        <Link
           to="/watchlist"
           className={`flex flex-col items-center gap-1 w-14 transition-colors ${
             location.pathname === "/watchlist" ? "text-otherColor" : "text-secondaryTextColor"
@@ -424,3 +463,4 @@ export default function Nav() {
     </>
   );
 }
+
